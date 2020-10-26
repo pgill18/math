@@ -54,7 +54,7 @@
 			}
 			if(selection.type==='add') {
 				if(values.x < 1) values.x = 1; if(values.y < 0) values.y = 0;
-				if(++values.y > 12) { values.x++; values.y = 1; }
+				if(++values.y > 20) { values.x++; values.y = 1; }
 				if(selection.mode==='random') {
 					values.x = random(2,10);
 					values.y = random(2,10);
@@ -65,12 +65,12 @@
 			}
 			if(selection.type==='sub') {
 				if(values.x < 1) values.x = 1; if(values.y < values.x) values.y = values.x;
-				if(++values.y > 12) { values.x++; values.y = 1; }
+				if(++values.y > 20) { values.x++; values.y = values.x; }
 				if(selection.mode==='random') {
 					values.x = random(2,10);
 					values.y = random(2,10);
 				}
-		    	values.s = `x`;
+		    	values.s = `-`;
 				values.result = values.y - values.x;
 		    	values.sentence = `${values.y} minus ${values.x}`;
 			}
@@ -126,7 +126,7 @@
 						speak_it(output===values.result);
 						// if(output!==values.result) beep();
 						// setTimeout(() => speak_it(values.result), 100);
-						speak_it(values.result);
+						if(output!==values.result) speak_it(values.result);
 						document.getElementById('o-value').textContent = values.result;
 					}
 					calculate(values, selection);
@@ -177,8 +177,12 @@
 		}
 		function set_range(value) {
 			selection.value = parseInt(value);
-			console.log(selection);
 			values.x = selection.value;
+			values.y = 0;
+			values.result = 0;
+			console.log(selection);
+			if(!document.getElementById('command-me').textContent)
+				document.getElementById('command-me').textContent = 'Say "Start"';
 		}
 
 		function round(num, digits=0) {
@@ -199,38 +203,42 @@
 		<br>
 		<form action="https://www.google.com/search" target="_blank">
 			<div class="row">
-				<div class="dropdown col-4 ml-auto">
-				  <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				    Mutltiplication tables
-				  </button>
-				  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-				    <a class="dropdown-item" href="#" onclick="select('tables', 'mult', this)">Mutltiplication tables</a>
-				    <a class="dropdown-item" href="#" onclick="select('random', 'mult', this)">Random Mutilications</a>
-				    <div class="dropdown-divider"></div>
-				    <a class="dropdown-item" href="#" onclick="select('tables', 'div', this)">Division tables</a>
-				    <a class="dropdown-item" href="#" onclick="select('random', 'div', this)">Random Divisions</a>
-				    <div class="dropdown-divider"></div>
-				    <a class="dropdown-item" href="#" onclick="select('tables', 'add', this)">Addition tables</a>
-				    <a class="dropdown-item" href="#" onclick="select('random', 'add', this)">Random Additions</a>
-				    <div class="dropdown-divider"></div>
-				    <a class="dropdown-item" href="#" onclick="select('tables', 'sub', this)">Subtraction tables</a>
-				    <a class="dropdown-item" href="#" onclick="select('random', 'sub', this)">Random Subtractions</a>
-				  </div>
+				<div class="col-12 col-sm-6">
+					<div class="dropdown col-12">
+					  <button class="btn btn-xl btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					    Mutltiplication tables
+					  </button>
+					  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+					    <a class="dropdown-item" href="#" onclick="select('tables', 'mult', this)">Mutltiplication tables</a>
+					    <a class="dropdown-item" href="#" onclick="select('random', 'mult', this)">Random Mutilications</a>
+					    <div class="dropdown-divider"></div>
+					    <a class="dropdown-item" href="#" onclick="select('tables', 'div', this)">Division tables</a>
+					    <a class="dropdown-item" href="#" onclick="select('random', 'div', this)">Random Divisions</a>
+					    <div class="dropdown-divider"></div>
+					    <a class="dropdown-item" href="#" onclick="select('tables', 'add', this)">Addition tables</a>
+					    <a class="dropdown-item" href="#" onclick="select('random', 'add', this)">Random Additions</a>
+					    <div class="dropdown-divider"></div>
+					    <a class="dropdown-item" href="#" onclick="select('tables', 'sub', this)">Subtraction tables</a>
+					    <a class="dropdown-item" href="#" onclick="select('random', 'sub', this)">Random Subtractions</a>
+					  </div>
+					</div>
+					<div class="col-12">
+						<input type="range" value="2" min="1" max="20" style="font-size: 100px" oninput="set_range(this.value); this.nextElementSibling.value = this.value">
+						<output>2</output>
+					</div>
 				</div>
-				<div class="col-4">
-					<input type="range" value="2" min="1" max="20" oninput="set_range(this.value); this.nextElementSibling.value = this.value">
-					<output>2</output>
-				</div>
-				<div class="btn btn-outline-primary col-3 mr-auto" style="xfont-size:20px; color: dimgray;">
-					<p><b id="y-value">Y</b> <small id="s-value">x</small> <b id="x-value">X</b> = <b id="o-value">?</b></p>
+				<div class="col-12 col-sm-6">
+					<div class="btn btn-xl btn-outline-primary col-md-4" style="xfont-size:20px; color: dimgray;">
+						<p><b id="y-value">Y</b> <small id="s-value">x</small> <b id="x-value">X</b> = <b id="o-value">?</b></p>
+					</div>
 				</div>
 			</div>
 			<hr>
 			<!-- <input name="query" placeholder="Search" id="query" autofocus> -->
-			<input type="button" class="btn btn-primary col-12" value="Go" onclick="listen()">  
+			<input type="button" class="btn btn-md btn-primary btn-block" value="Go" onclick="listen()">  
 			<br>
 			<a type="button" class="btn col-12" id="command-me">Click Go, then say "Start"</a>
-			<input type="button" class="btn btn-link col-2" value="Test" onclick="test()">  
+			<input type="button" class="btn btn-link col-2" value="Test" onclick="test()" hidden>  
 		</form>
 	</div>
 </body>
