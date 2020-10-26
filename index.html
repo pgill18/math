@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css" integrity="sha384-DhY6onE6f3zzKbjUPRc2hOzGAdEf4/Dz+WJwBvEYL/lkkIsI3ihufq9hk9K4lVoK" crossorigin="anonymous">
+
+    <!-- Option 1: Bootstrap Bundle with Popper.js -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.bundle.min.js" integrity="sha384-BOsAfwzjNJHrJ8cZidOg56tcQWfp6y72vEJ8xQ9w6Quywb24iOsW913URv1IS4GD" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    <title>Math, world!</title>
+  </head>
+  <body>
+	<script type="text/javascript">
+		let values = { x: 1, y: 0, result: 0, sentence: '' };
+		let selection = {mode: 'tables', type: 'mult', value: 1};
+		window.speechSynthesis.getVoices();
+		const synthesis = { voices: [], pitch: 1, rate: 1, volume: 1 }; // defaults
+		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+		setTimeout(() => synthesis.voices = window.speechSynthesis.getVoices(), 100);
+
+		function calculate(values, selection) {
+			if(selection.type==='mult') {
+				if(values.x < 1) values.x = 1; if(values.y < 0) values.y = 0;
+				if(++values.y > 12) { values.x++; values.y = 1; }
+				if(selection.mode==='random') {
+					values.x = random(2,10);
+					values.y = random(2,10);
+				}
+		    	values.s = `x`;
+				values.result = values.y * values.x;
+		    	values.sentence = `${values.y} times ${values.x}`;
+			}
+			if(selection.type==='div') {
+				values.y = values.result;
+				if(values.x < 1) values.x = 1; if(values.y < 0) values.y = 0;
+				if(++values.y > 12) { values.x++; values.y = 1; }
+				if(selection.mode==='random') {
+					values.x = random(2,10);
+					values.y = random(2,10);
+				}
+		    	values.s = `/`;
+				values.result = values.y * values.x; // mutliply and reverse to get whole numbers
+				[values.y, values.result] = [values.result, values.y];
+		    	values.sentence = `${values.y} divided-by ${values.x}`;
+			}
+			if(selection.type==='add') {
+				if(values.x < 1) values.x = 1; if(values.y < 0) values.y = 0;
+				if(++values.y > 12) { values.x++; values.y = 1; }
+				if(selection.mode==='random') {
+					values.x = random(2,10);
+					values.y = random(2,10);
+				}
+		    	values.s = `+`;
+				values.result = values.y + values.x;
+		    	values.sentence = `${values.y} plus ${values.x}`;
+			}
+			if(selection.type==='sub') {
+				if(values.x < 1) values.x = 1; if(values.y < values.x) values.y = values.x;
+				if(++values.y > 12) { values.x++; values.y = 1; }
+				if(selection.mode==='random') {
+					values.x = random(2,10);
+					values.y = random(2,10);
+				}
+		    	values.s = `x`;
+				values.result = values.y - values.x;
+		    	values.sentence = `${values.y} minus ${values.x}`;
+			}
+		}
+
+		function test() {
+			let command_me = document.getElementById('command-me').textContent;
+			if(command_me) { document.getElementById('command-me').textContent = '' }
+			else if(values.result) {
+				let output = parseInt(values.result);
+				// speak_it(latest.transcript);
+				// speak_it(output);
+				speak_it(output===values.result);
+				// if(output!==values.result) beep();
+				// setTimeout(() => speak_it(values.result), 100);
+				speak_it(values.result);
+				document.getElementById('o-value').textContent = values.result;
+			}
+			calculate(values, selection);
+			setTimeout(() => {
+				document.getElementById('y-value').textContent = values.y;
+				document.getElementById('x-value').textContent = values.x;
+				document.getElementById('s-value').textContent = values.s;
+				document.getElementById('o-value').textContent = '?';
+			}, 3000);
+			// setTimeout(() => speak_it(values.sentence), 1);
+			speak_it(values.sentence);
+		}
+
+		function listen() {
+			let recognition = new SpeechRecognition();
+		    let speechGrammarList = new SpeechGrammarList();
+
+		    speechGrammarList.addFromString(grammar(), 1);
+		    recognition.grammars = speechGrammarList;
+		    recognition.lang = 'en-US'; // info.lang = 'en-US';
+		    // console.log(grammar());
+
+			recognition.continuous = true;
+			recognition.start();
+			recognition.onresult = function(event) {
+			    if (event.results.length > 0) {
+			    	let latest = event.results[event.results.length-1][0];
+			    	console.log(`... ${latest.transcript} `)
+					// if(result) speak_it(latest.transcript);
+					// if(result) speak_it(result);
+					let command_me = document.getElementById('command-me').textContent;
+					if(command_me) { document.getElementById('command-me').textContent = '' }
+					else if(values.result) {
+						let output = parseInt(latest.transcript);
+						// speak_it(latest.transcript);
+						// speak_it(output);
+						speak_it(output===values.result);
+						// if(output!==values.result) beep();
+						// setTimeout(() => speak_it(values.result), 100);
+						speak_it(values.result);
+						document.getElementById('o-value').textContent = values.result;
+					}
+					calculate(values, selection);
+					setTimeout(() => {
+						document.getElementById('y-value').textContent = values.y;
+						document.getElementById('x-value').textContent = values.x;
+						document.getElementById('s-value').textContent = values.s;
+						document.getElementById('o-value').textContent = '?';
+					}, 3000);
+					// setTimeout(() => speak_it(values.sentence), 1);
+					speak_it(values.sentence);
+				}
+			}
+		}
+
+		function speak_it(text) {
+			// text = convert(text);
+			const ut = new SpeechSynthesisUtterance(text);
+			[ut.voice, ut.pitch, ut.rate] = [synthesis.voices[3], synthesis.pitch, synthesis.rate];
+			window.speechSynthesis.speak(ut);
+			// window.speechSynthesis.getVoices().forEach(voice => console.log(voice.name + ' (' + voice.lang + ')'));
+			// console.log(`speaking...`, text)
+			console.log(synthesis);
+			console.log(text)
+			return text;
+		}
+		function grammar() {
+			let grammar_names = []; //[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
+			for(let x of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]) {
+				for(y of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]) {
+					grammar_names.push(x*y);
+				}
+			}
+
+			return '#JSGF V1.0; grammar phrase; public <phrase> = ' + grammar_names.join(" | ") +' ;';
+		}
+
+		function select(mode, type, _this) {
+			selection.mode = mode;
+			selection.type = type;
+			values.x = selection.value;
+			values.y = 0;
+			values.result = 0;
+			console.log(selection);
+			document.getElementById('dropdownMenuButton').textContent = _this.textContent;
+			if(!document.getElementById('command-me').textContent)
+				document.getElementById('command-me').textContent = 'Say "Start"';
+		}
+		function set_range(value) {
+			selection.value = parseInt(value);
+			console.log(selection);
+			values.x = selection.value;
+		}
+
+		function round(num, digits=0) {
+		    let factor = Math.pow(10, digits);
+		    return Math.round(num*factor)/factor;
+		}
+		function random(min, max, round=0) {
+		    let number = Math.random() * (max - min) + min;
+		    let rounder = Math.pow(10, round);
+		    return round===0 ? Math.round(number) : Math.round(number*rounder)/rounder;
+		}
+		function delay(seconds, speedup=1) {
+		    return new Promise(resolve => setTimeout(resolve, seconds*1000/speedup));
+		}
+	</script>
+
+	<div class="container-fluid">
+		<br>
+		<form action="https://www.google.com/search" target="_blank">
+			<div class="row">
+				<div class="dropdown col-4 ml-auto">
+				  <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				    Mutltiplication tables
+				  </button>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				    <a class="dropdown-item" href="#" onclick="select('tables', 'mult', this)">Mutltiplication tables</a>
+				    <a class="dropdown-item" href="#" onclick="select('random', 'mult', this)">Random Mutilications</a>
+				    <div class="dropdown-divider"></div>
+				    <a class="dropdown-item" href="#" onclick="select('tables', 'div', this)">Division tables</a>
+				    <a class="dropdown-item" href="#" onclick="select('random', 'div', this)">Random Divisions</a>
+				    <div class="dropdown-divider"></div>
+				    <a class="dropdown-item" href="#" onclick="select('tables', 'add', this)">Addition tables</a>
+				    <a class="dropdown-item" href="#" onclick="select('random', 'add', this)">Random Additions</a>
+				    <div class="dropdown-divider"></div>
+				    <a class="dropdown-item" href="#" onclick="select('tables', 'sub', this)">Subtraction tables</a>
+				    <a class="dropdown-item" href="#" onclick="select('random', 'sub', this)">Random Subtractions</a>
+				  </div>
+				</div>
+				<div class="col-4">
+					<input type="range" value="2" min="1" max="20" oninput="set_range(this.value); this.nextElementSibling.value = this.value">
+					<output>2</output>
+				</div>
+				<div class="btn btn-outline-primary col-3 mr-auto" style="xfont-size:20px; color: dimgray;">
+					<p><b id="y-value">Y</b> <small id="s-value">x</small> <b id="x-value">X</b> = <b id="o-value">?</b></p>
+				</div>
+			</div>
+			<hr>
+			<!-- <input name="query" placeholder="Search" id="query" autofocus> -->
+			<input type="button" class="btn btn-primary col-12" value="Go" onclick="listen()">  
+			<br>
+			<a type="button" class="btn col-12" id="command-me">Click Go, then say "Start"</a>
+			<input type="button" class="btn btn-link col-2" value="Test" onclick="test()">  
+		</form>
+	</div>
+</body>
+</html>
+
+<!-- 
+0. Microsoft David Desktop - English (United States) (en-US)
+1. Microsoft Zira Desktop - English (United States) (en-US)
+2. Google Deutsch (de-DE)
+3. Google US English (en-US)
+4. Google UK English Female (en-GB)
+5. Google UK English Male (en-GB)
+6. Google español (es-ES)
+7. Google español de Estados Unidos (es-US)
+8. Google français (fr-FR)
+9. Google हिन्दी (hi-IN)
+ -->
+
