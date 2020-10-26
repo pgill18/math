@@ -23,8 +23,8 @@
 		let selection = {mode: 'tables', type: 'mult', value: 1};
 		window.speechSynthesis.getVoices();
 		const synthesis = { voices: [], pitch: 1, rate: 1, volume: 1 }; // defaults
-		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-		const SpeechGrammarList = window.SpeechGrammarList || window.webkitSpeechGrammarList;
+		const SpeechRecognition = window.speechRecognition || window.webkitSpeechRecognition;
+		const SpeechGrammarList = window.speechGrammarList || window.webkitSpeechGrammarList;
 		setTimeout(() => synthesis.voices = window.speechSynthesis.getVoices(), 100);
 
 		function calculate(values, selection) {
@@ -34,6 +34,7 @@
 				if(selection.mode==='random') {
 					values.x = random(2,10);
 					values.y = random(2,10);
+					if(selection.value>1) values.x = selection.value;
 				}
 		    	values.s = `x`;
 				values.result = values.y * values.x;
@@ -46,6 +47,7 @@
 				if(selection.mode==='random') {
 					values.x = random(2,10);
 					values.y = random(2,10);
+					if(selection.value>1) values.x = selection.value;
 				}
 		    	values.s = `/`;
 				values.result = values.y * values.x; // mutliply and reverse to get whole numbers
@@ -58,6 +60,7 @@
 				if(selection.mode==='random') {
 					values.x = random(2,10);
 					values.y = random(2,10);
+					if(selection.value>1) values.x = selection.value;
 				}
 		    	values.s = `+`;
 				values.result = values.y + values.x;
@@ -69,6 +72,7 @@
 				if(selection.mode==='random') {
 					values.x = random(2,10);
 					values.y = random(2,10);
+					if(selection.value>1) values.x = selection.value;
 				}
 		    	values.s = `-`;
 				values.result = values.y - values.x;
@@ -224,7 +228,7 @@
 					</div>
 					<div class="col-12">
 						<input type="range" value="2" min="1" max="20" style="font-size: 100px" oninput="set_range(this.value); this.nextElementSibling.value = this.value">
-						<output>2</output>
+						<output>1</output>
 					</div>
 				</div>
 				<div class="col-12 col-sm-6">
