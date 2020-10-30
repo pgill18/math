@@ -172,7 +172,7 @@
 			    	if(matched && matched[2]) return setVoiceBasedSelection({value: matched[2].toLowerCase()});
 					// if(result) speak_it(latest.transcript);
 					// if(result) speak_it(result);
-					recognition.stop(); // to avoid echoing itself, restart after done speaking
+					await recognition.stop(); // to avoid echoing itself, restart after done speaking
 					let command_me = document.getElementById('command-me').textContent;
 					if(command_me) { document.getElementById('command-me').textContent = '' }
 					else if(values.result) {
@@ -199,7 +199,7 @@
 					// setTimeout(() => speak_it(values.sentence), 1);
 					await speak_it(values.sentence, recognition);
 					await delay(0.5);
-					recognition.start();
+					await recognition.start();
 				}
 			}
 		}
