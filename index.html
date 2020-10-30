@@ -152,32 +152,42 @@
 		    recognition.lang = 'en-US'; // info.lang = 'en-US';
 		    // console.log(grammar());
 
-			// recognition.continuous = true;
+			recognition.continuous = true;
 			recognition.start();
 			recognition.onresult = async function(event) {
 			    if (event.results.length > 0) {
 			    	let latest = event.results[event.results.length-1][0];
 			    	console.log(`... ${latest.transcript} `);
 			    	let matched = latest.transcript.match(/\s*(do|set|at|timmi)\s+(multiplication|division|addition|subtraction)\s+(\d+)\s+table/i);
-			    	if(matched && matched[2]) return setVoiceBasedSelection({type: matched[2].toLowerCase(), value: matched[3].toLowerCase()});
+			    	if(matched && matched[2]) return return_it(setVoiceBasedSelection({type: matched[2].toLowerCase(), value: matched[3].toLowerCase()}), recognition);
 			    	matched = latest.transcript.match(/\s*(do|set|at|timmi)\s+(multiplication|division|addition|subtraction)\s+table/i);
-			    	if(matched && matched[2]) return setVoiceBasedSelection({type: matched[2].toLowerCase()});
+			    	if(matched && matched[2]) return return_it(setVoiceBasedSelection({type: matched[2].toLowerCase()}), recognition);
 			    	matched = latest.transcript.match(/\s*(do|set|at|timmi)\s+(random)\s+(\d+)\s+table/i);
-			    	if(matched && matched[2]) return setVoiceBasedSelection({mode: 'random', value: matched[3].toLowerCase()});
+			    	if(matched && matched[2]) return return_it(setVoiceBasedSelection({mode: 'random', value: matched[3].toLowerCase()}), recognition);
 			    	matched = latest.transcript.match(/\s*(do|set|at|timmi)\s+(random)\s+(\w+)\s+table/i);
-			    	if(matched && matched[2]) return setVoiceBasedSelection({mode: 'random', type: matched[3].toLowerCase()});
+			    	if(matched && matched[2]) return return_it(setVoiceBasedSelection({mode: 'random', type: matched[3].toLowerCase()}), recognition);
 			    	matched = latest.transcript.match(/\s*(do|set|at|timmi)\s+(random)\s+(value|table)/i);
-			    	if(matched && matched[2]) return setVoiceBasedSelection({mode: 'random'});
+			    	if(matched && matched[2]) return return_it(setVoiceBasedSelection({mode: 'random'}), recognition);
 			    	matched = latest.transcript.match(/\s*(do|set|at|timmi)\s+(\d+)\s+table/i);
-			    	if(matched && matched[2]) return setVoiceBasedSelection({value: matched[2].toLowerCase()});
+			    	if(matched && matched[2]) return return_it(setVoiceBasedSelection({value: matched[2].toLowerCase()}), recognition);
 					// if(result) speak_it(latest.transcript);
 					// if(result) speak_it(result);
 					// recognition.stop(); // to avoid echoing itself, restart after done speaking
 					// await delay(0.5);
+
+					// keep only the last word
+					let transcript = latest.transcript.trim();
+					let words = transcript.split(/\s+/);
+					console.log(`words.length=${words.length} words=${words}`)
+					if(words.length > 1) {
+						console.log(`That must be echo. Ignoring it.`)
+						return; //transcript = words[words.length-1];
+					}
+
 					let command_me = document.getElementById('command-me').textContent;
 					if(command_me) { document.getElementById('command-me').textContent = '' }
 					else if(values.result) {
-						let output = parseInt(latest.transcript);
+						let output = parseInt(transcript);
 						// speak_it(latest.transcript);
 						// speak_it(output);
 						await speak_it(output===values.result);
@@ -199,10 +209,15 @@
 					document.getElementById('n-score').textContent = score.total;
 					// setTimeout(() => speak_it(values.sentence), 1);
 					await speak_it(values.sentence);
-					await delay(0.5);
-					recognition.start();
+					// await delay(0.5);
+					// recognition.start();
 				}
 			}
+		}
+
+		function return_it(value, recognition) {
+			// recognition.start();
+			return value;
 		}
 
 		async function speak_it(text) {
