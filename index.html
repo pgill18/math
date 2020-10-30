@@ -173,6 +173,7 @@
 					// if(result) speak_it(latest.transcript);
 					// if(result) speak_it(result);
 					await recognition.stop(); // to avoid echoing itself, restart after done speaking
+					await delay(0.5);
 					let command_me = document.getElementById('command-me').textContent;
 					if(command_me) { document.getElementById('command-me').textContent = '' }
 					else if(values.result) {
