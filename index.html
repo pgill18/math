@@ -172,7 +172,7 @@
 			    	if(matched && matched[2]) return setVoiceBasedSelection({value: matched[2].toLowerCase()});
 					// if(result) speak_it(latest.transcript);
 					// if(result) speak_it(result);
-					await recognition.stop(); // to avoid echoing itself, restart after done speaking
+					recognition.stop(); // to avoid echoing itself, restart after done speaking
 					await delay(0.5);
 					let command_me = document.getElementById('command-me').textContent;
 					if(command_me) { document.getElementById('command-me').textContent = '' }
@@ -180,10 +180,10 @@
 						let output = parseInt(latest.transcript);
 						// speak_it(latest.transcript);
 						// speak_it(output);
-						await speak_it(output===values.result, recognition);
+						await speak_it(output===values.result);
 						// if(output!==values.result) beep();
 						// setTimeout(() => speak_it(values.result), 100);
-						if(output!==values.result) speak_it(values.result, recognition);
+						if(output!==values.result) await speak_it(values.result);
 						else score.your++;
 						score.total++;
 						document.getElementById('o-value').textContent = values.result;
@@ -198,14 +198,14 @@
 					document.getElementById('u-score').textContent = score.your;
 					document.getElementById('n-score').textContent = score.total;
 					// setTimeout(() => speak_it(values.sentence), 1);
-					await speak_it(values.sentence, recognition);
+					await speak_it(values.sentence);
 					await delay(0.5);
-					await recognition.start();
+					recognition.start();
 				}
 			}
 		}
 
-		async function speak_it(text, recognition) {
+		async function speak_it(text) {
 			// text = convert(text);
 			const ut = new SpeechSynthesisUtterance(text);
 			[ut.voice, ut.pitch, ut.rate] = [synthesis.voices[3], synthesis.pitch, synthesis.rate];
