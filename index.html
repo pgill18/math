@@ -174,6 +174,8 @@
 					// if(result) speak_it(result);
 					// recognition.stop(); // to avoid echoing itself, restart after done speaking
 					// await delay(0.5);
+					let verbose = 0; 
+					synthesis.rate = 1.1;
 
 					// keep only the last word
 					let transcript = latest.transcript.trim();
@@ -190,7 +192,8 @@
 						let output = parseInt(transcript);
 						// speak_it(latest.transcript);
 						// speak_it(output);
-						await speak_it(output===values.result);
+						if(verbose || output!==values.result)
+							await speak_it(output===values.result);
 						// if(output!==values.result) beep();
 						// setTimeout(() => speak_it(values.result), 100);
 						if(output!==values.result) await speak_it(values.result);
