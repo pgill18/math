@@ -19,7 +19,7 @@
   </head>
   <body>
 	<script type="text/javascript">
-		let score = { your: 0, total: 0 };
+		let score = { your: 0, total: 0, ducks: 0 };
 		let values = { x: 1, y: 0, result: 0, sentence: '' };
 		let selection = {mode: 'tables', type: 'mult', value: 1};
 		window.speechSynthesis.getVoices();
@@ -178,10 +178,22 @@
 					synthesis.rate = 1.1;
 
 					// keep only the last word
-					let transcript = latest.transcript.trim();
+					let transcript = latest.transcript.trim().toLowerCase();
+					if(transcript==='duck') {
+						if(++score.ducks>1) {
+							await speak_it(`That's too many ducks! Say a number.`)
+							return; //transcript = words[words.length-1];
+						}
+					}
+					if(transcript.match(/((don't\s+know)|(download)|(dunham)|(okay))/i)) {
+						synthesis.rate = 1.0;
+						await speak_it(`Say a number.`)
+						synthesis.rate = 1.1;
+						return; //transcript = words[words.length-1];
+					}
 					let words = transcript.split(/\s+/);
 					console.log(`words.length=${words.length} words=${words}`)
-					if(words.length > 1) {
+					if(words.length > 1 || transcript.match(/number/i)) {
 						console.log(`That must be echo. Ignoring it.`)
 						return; //transcript = words[words.length-1];
 					}
