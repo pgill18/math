@@ -19,7 +19,7 @@
   </head>
   <body>
 	<script type="text/javascript">
-		let score = { your: 0, total: 0, ducks: 0 };
+		let score = { your: 0, total: 0, ducks: 0, store: {} };
 		let values = { x: 1, y: 0, result: 0, sentence: '' };
 		let selection = {mode: 'tables', type: 'mult', value: 1};
 		window.speechSynthesis.getVoices();
@@ -185,23 +185,68 @@
 							return; //transcript = words[words.length-1];
 						}
 					}
+					if(typeof parseInt(transcript)!=='number' || parseInt(transcript)!==parseInt(transcript)) {
+						if(!score.store[transcript]) score.store[transcript] = 1;
+						else score.store[transcript]++;
+						if((typeof transcript==='string') && (score.store[transcript]>1)) {
+							// await speak_it(`That's too many ${transcript}s! Say a number.`)
+							// return;
+						} else {
+							// await speak_it(`Say a number.`)
+							// return;
+						}
+					}
 					if(transcript.match(/((don't\s+know)|(download)|(dunham)|(okay))/i)) {
 						synthesis.rate = 1.0;
 						await speak_it(`Say a number.`)
 						synthesis.rate = 1.1;
 						return; //transcript = words[words.length-1];
 					}
+					let answer = transcript;
 					let words = transcript.split(/\s+/);
 					console.log(`words.length=${words.length} words=${words}`)
+					// if(words.length > 1 || transcript.match(/number/i)) {
+					// 	console.log(`That must be echo. Ignoring it.`)
+					// 	return; //transcript = words[words.length-1];
+					// }
 					if(words.length > 1 || transcript.match(/number/i)) {
-						console.log(`That must be echo. Ignoring it.`)
-						return; //transcript = words[words.length-1];
+						let endword = words[words.length-1];
+						console.log(`endword=${endword}`)
+						let parts = endword.split('/'); // echo gets joined with a / as in: ...  x 1/11
+						if(parts.length>1) endword = parts[parts.length-1];
+						endword = parseInt(endword);
+						console.log(`endword=${endword}, parts=`, parts)
+						console.log(`endword=${endword}, typeof endword = `, typeof endword)
+						console.log(`values.x=${values.x}, typeof values.x = `, typeof values.x)
+						console.log(`values=`, values);
+						if(endword!==values.x) { // 
+							if(endword===parseInt(`${values.x}${values.result}`)) { // echo gets joined as in: ...  x 111
+								answer = values.result;
+								console.log(`answer = values.result`);
+								console.log(`answer=${answer}, typeof answer = `, typeof answer)
+								// console.log(`values.result=${values.result}, typeof values.result = `, typeof values.result)
+								// console.log(`values.x=${values.x}, typeof values.x = `, typeof values.x)
+								console.log(`endword=${endword}, typeof endword = `, typeof endword)
+								console.log(`There must have been echo-plus. Not Ignoring it.`)
+							} else {
+								answer = endword;
+								console.log(`answer = endword`);
+								console.log(`answer=${answer}, typeof answer = `, typeof answer)
+								console.log(`endword=${endword}, typeof endword = `, typeof endword)
+								// console.log(`values.result=${values.result}, typeof values.result = `, typeof values.result)
+								// console.log(`values.x=${values.x}, typeof values.x = `, typeof values.x)
+								console.log(`There must have been echo-plus. Not Ignoring it.`)
+							}
+						} else {
+							console.log(`That must be echo. Ignoring it.`)
+							return; //transcript = words[words.length-1];
+						}
 					}
 
 					let command_me = document.getElementById('command-me').textContent;
 					if(command_me) { document.getElementById('command-me').textContent = '' }
 					else if(values.result) {
-						let output = parseInt(transcript);
+						let output = parseInt(answer);
 						// speak_it(latest.transcript);
 						// speak_it(output);
 						if(verbose || output!==values.result)
